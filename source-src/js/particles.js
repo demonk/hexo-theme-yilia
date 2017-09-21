@@ -9,7 +9,7 @@
 
 var pJS = function(tag_id, params){
 
-  var canvas_el = document.querySelector('#'+tag_id+' > .particles-js-canvas-el');
+  var canvas_el = document.querySelector('#'+tag_id+' > .anm-canvas');
 
   /* particles.js variables with default values */
   this.pJS = {
@@ -1387,7 +1387,6 @@ var pJS = function(tag_id, params){
 
 
   pJS.fn.vendors.start = function(){
-
     if(isInArray('image', pJS.particles.shape.type)){
       pJS.tmp.img_type = pJS.particles.shape.image.src.substr(pJS.particles.shape.image.src.length - 3);
       pJS.fn.vendors.loadImg(pJS.tmp.img_type);
@@ -1404,21 +1403,22 @@ var pJS = function(tag_id, params){
 
 
   pJS.fn.vendors.eventsListeners();
-
   pJS.fn.vendors.start();
-  
 
 
 };
 
 /* ---------- global functions - vendors ------------ */
 
-Object.deepExtend = function(destination, source) {
+Object.deepExtend = function deepExtend(destination, source) {
   for (var property in source) {
     if (source[property] && source[property].constructor &&
      source[property].constructor === Object) {
       destination[property] = destination[property] || {};
-      arguments.callee(destination[property], source[property]);
+      //arguments.callee(destination[property], source[property]);
+      //arguments.callee is not supported any more
+        ////https://github.com/isagalaev/highlight.js/issues/75
+      deepExtend(destination[property], source[property]);
     } else {
       destination[property] = source[property];
     }
@@ -1481,23 +1481,26 @@ window.particlesJS = function(tag_id, params){
   /* no string id? so it's object params, and set the id with default id */
   if(typeof(tag_id) != 'string'){
     params = tag_id;
-    tag_id = 'particles-js';
+    tag_id = 'container';
   }
 
   /* no id? set the id to default id */
   if(!tag_id){
-    tag_id = 'particles-js';
+    tag_id = 'container';
   }
 
   /* pJS elements */
   var pJS_tag = document.getElementById(tag_id),
-      pJS_canvas_class = 'particles-js-canvas-el',
-      exist_canvas = pJS_tag.getElementsByClassName(pJS_canvas_class);
+      pJS_canvas_class = 'anm-canvas',
+      exist_canvas = [].slice.call(pJS_tag.getElementsByClassName(pJS_canvas_class));
 
   /* remove canvas if exists into the pJS target tag */
   if(exist_canvas.length){
-    while(exist_canvas.length > 0){
-      pJS_tag.removeChild(exist_canvas[0]);
+    for(canvas in exist_canvas){
+      var parentNode=exist_canvas[canvas].parentNode
+      if(parentNode == pJS_tag){
+        pJS_tag.removeChild(exist_canvas[canvas])
+      }
     }
   }
 
@@ -1508,9 +1511,12 @@ window.particlesJS = function(tag_id, params){
   /* set size canvas */
   canvas_el.style.width = "100%";
   canvas_el.style.height = "100%";
+  canvas_el.style.display="block";
+  canvas_el.style.position="fixed";
 
   /* append canvas */
-  var canvas = document.getElementById(tag_id).appendChild(canvas_el);
+  var firstNode=pJS_tag.firstChild
+  var canvas = firstNode?pJS_tag.insertBefore(canvas_el,firstNode):pJS_tag.appendChild(canvas_el)
 
   /* launch particle.js */
   if(canvas != null){
@@ -1539,3 +1545,16 @@ window.particlesJS.load = function(tag_id, path_config_json, callback){
   xhr.send();
 
 };
+
+function init(){
+	/* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
+    window.addEventListener("load",function(){
+   	 particlesJS.load('container','/particles.json', function() {
+    	   //console.log('加载particles.js');
+    	});
+    },false)
+}
+
+module.exports={
+    init:init
+}
