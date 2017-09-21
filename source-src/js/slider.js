@@ -1,5 +1,7 @@
 // 动画
-import Anm from './anm'
+//import Anm from './anm'
+import Anm from './particles'
+
 // 浏览器判断
 import Browser from './browser'
 // Q 基础库
