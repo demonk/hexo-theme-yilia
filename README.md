@@ -212,4 +212,12 @@ friends:
 aboutme: 很惭愧<br><br>只做了一点微小的工作<br>谢谢大家
 ```
 
+# 开发步骤
 
+安装node+npm
+
+安装依赖 进入根目录，执行 npm install
+
+开发 执行npm run dev 此时会用webpack打包，把文件编译到source文件里，但文件不会经过压缩
+
+发布 执行npm run dist 最终确定版本，此时的编译会经过压缩。
